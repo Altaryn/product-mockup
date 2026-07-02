@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Semantic theme tokens as space-separated RGB channels so Tailwind's
+  `rgb(var(--x) / <alpha-value>)` works. Two polarities per DESIGN-sentry.md:
+  light canvas = dense transactional product surface, dark canvas = night polarity.
+*/
+:root {
+  --app-bg: 245 245 249; /* subtle violet-neutral chrome behind cards */
+  --surface: 255 255 255; /* #ffffff — cards, tables */
+  --surface-2: 250 250 252; /* faint zebra / inset */
+  --surface-3: 240 240 244; /* hover / pressed neutral */
+  --content: 31 22 51; /* #1f1633 ink */
+  --content-muted: 106 100 124; /* muted violet-gray */
+  --content-faint: 150 145 166;
+  --hairline: 229 231 235; /* #e5e7eb hairline-cloud */
+  --hairline-strong: 207 207 219; /* #cfcfdb hairline-cool */
+  --btn-primary-bg: 21 15 35; /* #150f23 filled primary on light */
+  --btn-primary-fg: 255 255 255;
+}
+
+.dark {
+  --app-bg: 31 22 51; /* #1f1633 surface-canvas-dark */
+  --surface: 21 15 35; /* #150f23 surface-night — cards on dark */
+  --surface-2: 31 22 51;
+  --surface-3: 42 32 66;
+  --content: 255 255 255;
+  --content-muted: 189 184 192; /* #bdb8c0 on-dark-muted */
+  --content-faint: 121 98 140; /* violet-mid-ish */
+  --hairline: 54 45 89; /* #362d59 hairline-violet */
+  --hairline-strong: 54 45 89;
+  --btn-primary-bg: 255 255 255; /* inverted CTA on dark polarity */
+  --btn-primary-fg: 31 22 51;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-app-bg text-content font-sans;
+    font-size: 16px;
+    margin: 0;
+  }
+  * {
+    border-color: rgb(var(--hairline));
+  }
+  /* Keyboard focus only — the single blue in the system */
+  :focus-visible {
+    outline: 2px solid #9dc1f5;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: #c2ef4e;
+    color: #1f1633;
+  }
+  /* Slim, on-brand scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--hairline-strong)) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgb(var(--hairline-strong));
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+}
+
+@layer components {
+  /* Signature lime keyword chip (DESIGN §chip-lime-keyword) — used scarcely */
+  .lime-chip {
+    @apply inline-block rounded-xs bg-lime px-2 text-ink;
+    line-height: 1.1;
+  }
+  /* Dark starfield atmosphere for the persistent nav rail */
+  .starfield {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.11) 1px, transparent 1px),
+      radial-gradient(rgba(194, 239, 78, 0.08) 1px, transparent 1px);
+    background-size: 26px 26px, 44px 44px;
+    background-position: 0 0, 13px 22px;
+  }
+  .card {
+    @apply rounded-xl border border-hairline bg-surface;
+  }
+}
