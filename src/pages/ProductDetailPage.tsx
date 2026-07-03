@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { productById } from '../data/products.mock'
+import { useAppState } from '../store'
 import { formatCLP, formatDate } from '../lib/format'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
@@ -25,7 +25,8 @@ import {
 
 export function ProductDetailPage() {
   const { id } = useParams()
-  const product = id ? productById(id) : undefined
+  const { products } = useAppState()
+  const product = products.find((p) => p.id === id)
   const [tab, setTab] = useState('tech')
 
   if (!product) {

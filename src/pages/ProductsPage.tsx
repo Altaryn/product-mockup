@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
+import { useAppState } from '../store'
 import { PageHeader } from '../components/ui/PageHeader'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
@@ -8,8 +9,9 @@ import { Segmented } from '../components/ui/Segmented'
 import { ProductTable } from '../components/products/ProductTable'
 import { ProductCard } from '../components/products/ProductCard'
 import { IconSearch, IconGrid, IconRows, IconPlus, IconBox } from '../components/ui/icons'
-import { products, categories, families } from '../data/products.mock'
-import type { ProductStatus } from '../data/types'
+import type { Product, ProductStatus } from '../data/types'
+
+const uniq = (xs: string[]) => Array.from(new Set(xs))
 
 type SortKey = 'updated' | 'name' | 'price-desc' | 'price-asc' | 'code'
 type View = 'table' | 'cards'
@@ -22,6 +24,7 @@ const statusOptions: { value: ProductStatus | 'all'; label: string }[] = [
 ]
 
 export function ProductsPage() {
+  const { products } = useAppState()
   const [params] = useSearchParams()
   const [search, setSearch] = useState(params.get('q') ?? '')
   const [category, setCategory] = useState('all')
@@ -29,6 +32,10 @@ export function ProductsPage() {
   const [status, setStatus] = useState<ProductStatus | 'all'>('all')
   const [sort, setSort] = useState<SortKey>('updated')
   const [view, setView] = useState<View>('table')
+
+  // Opciones de filtro derivadas del catálogo vivo (incluye productos creados).
+  const categories = useMemo(() => uniq(products.map((p) => p.category)), [products])
+  const families = useMemo(() => uniq(products.map((p) => p.family)), [products])
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -56,7 +63,7 @@ export function ProductsPage() {
       }
     })
     return sorted
-  }, [search, category, family, status, sort])
+  }, [products, search, category, family, status, sort])
 
   const hasFilters = search || category !== 'all' || family !== 'all' || status !== 'all'
   const clear = () => {
@@ -73,9 +80,11 @@ export function ProductsPage() {
         title="Productos"
         subtitle="Información técnica, comercial, logística y de proveedores centralizada por SKU."
         actions={
-          <Button>
-            <IconPlus size={18} /> Nuevo producto
-          </Button>
+          <Link to="/productos/nuevo">
+            <Button>
+              <IconPlus size={18} /> Nuevo producto
+            </Button>
+          </Link>
         }
       />
 
@@ -163,23 +172,21 @@ export function ProductsPage() {
           <div className="hidden md:block">
             <ProductTable items={filtered} />
           </div>
-          <CardGrid ids={filtered.map((p) => p.id)} className="md:hidden" />
+          <CardGrid items={filtered} className="md:hidden" />
         </>
       ) : (
-        <CardGrid ids={filtered.map((p) => p.id)} />
+        <CardGrid items={filtered} />
       )}
     </div>
   )
 }
 
-function CardGrid({ ids, className }: { ids: string[]; className?: string }) {
-  const map = new Map(products.map((p) => [p.id, p]))
+function CardGrid({ items, className }: { items: Product[]; className?: string }) {
   return (
     <div className={`grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 ${className ?? ''}`}>
-      {ids.map((id) => {
-        const p = map.get(id)!
-        return <ProductCard key={id} product={p} />
-      })}
+      {items.map((p) => (
+        <ProductCard key={p.id} product={p} />
+      ))}
     </div>
   )
 }

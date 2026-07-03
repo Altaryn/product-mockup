@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
 import { ProductsPage } from './pages/ProductsPage'
+import { NewProductPage } from './pages/NewProductPage'
 import { ProductDetailPage } from './pages/ProductDetailPage'
 import { PricingPage } from './pages/PricingPage'
 import { OrdersListPage } from './pages/OrdersListPage'
@@ -14,6 +15,7 @@ export default function App() {
       <Route element={<AppShell />}>
         <Route index element={<Navigate to="/productos" replace />} />
         <Route path="/productos" element={<ProductsPage />} />
+        <Route path="/productos/nuevo" element={<NewProductPage />} />
         <Route path="/productos/:id" element={<ProductDetailPage />} />
         <Route path="/precios" element={<PricingPage />} />
         <Route path="/pedidos" element={<OrdersListPage />} />
