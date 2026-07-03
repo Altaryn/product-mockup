@@ -1,5 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { cn } from '../../lib/cn'
+import { useAppState } from '../../store'
+import { getInitials } from '../../lib/user'
 import {
   IconBox,
   IconSliders,
@@ -14,7 +16,7 @@ import {
 const nav = [
   { to: '/productos', label: 'Productos', icon: IconBox },
   { to: '/precios', label: 'Precios', icon: IconSliders },
-  { to: '/pedidos', label: 'Solicitud de pedido', icon: IconCart },
+  { to: '/pedidos', label: 'Solicitudes de pedido', icon: IconCart },
   { to: '/usuarios', label: 'Usuarios y permisos', icon: IconUsers },
 ]
 
@@ -31,6 +33,7 @@ export function Sidebar({
   collapsed?: boolean
   onToggleCollapse?: () => void
 }) {
+  const { currentUser } = useAppState()
   return (
     <aside
       className={cn(
@@ -45,8 +48,8 @@ export function Sidebar({
         </span>
         {!collapsed && (
           <div className="min-w-0 flex-1 leading-none">
-            <div className="font-display text-[19px] font-semibold">
-              Product <span className="lime-chip text-[19px]">Master</span>
+            <div className="font-display text-[16px] font-semibold">
+              Product <span className="lime-chip text-[16px]">Master</span>
             </div>
             <div className="mt-1 text-micro-cap uppercase text-on-dark-muted">Knauf · Procurement</div>
           </div>
@@ -122,14 +125,17 @@ export function Sidebar({
       </div>
 
       <div className={cn('border-t border-hairline-violet py-4', collapsed ? 'px-2' : 'px-4')}>
-        <div className={cn('flex items-center', collapsed ? 'justify-center' : 'gap-3')}>
+        <div
+          title={collapsed ? `${currentUser.name} · ${currentUser.role}` : undefined}
+          className={cn('flex items-center', collapsed ? 'justify-center' : 'gap-3')}
+        >
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-violet-deep text-on-primary text-caption font-semibold">
-            CA
+            {getInitials(currentUser.name)}
           </span>
           {!collapsed && (
             <div className="min-w-0">
-              <div className="truncate text-body-md text-on-primary">Carlos Alfaro</div>
-              <div className="text-micro-cap uppercase text-on-dark-muted">Administrador</div>
+              <div className="truncate text-body-md text-on-primary">{currentUser.name}</div>
+              <div className="text-micro-cap uppercase text-on-dark-muted">{currentUser.role}</div>
             </div>
           )}
         </div>

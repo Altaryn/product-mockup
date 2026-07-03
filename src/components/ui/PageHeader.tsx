@@ -19,7 +19,7 @@ export function PageHeader({
             {eyebrow}
           </div>
         )}
-        <h1 className="font-display text-heading-xl sm:text-[34px] leading-tight text-content">
+        <h1 className="font-display text-heading-xl sm:text-[28px] leading-tight text-content">
           {title}
         </h1>
         {subtitle && <p className="mt-1.5 text-body-md text-content-muted max-w-2xl">{subtitle}</p>}

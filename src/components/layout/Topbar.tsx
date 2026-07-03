@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../../theme'
+import { useAppState } from '../../store'
+import { getInitials } from '../../lib/user'
 import { IconMenu, IconSearch, IconSun, IconMoon } from '../ui/icons'
 
 export function Topbar({ onOpenNav }: { onOpenNav: () => void }) {
   const { theme, toggle } = useTheme()
+  const { currentUser } = useAppState()
   const navigate = useNavigate()
   const [q, setQ] = useState('')
 
@@ -45,8 +48,11 @@ export function Topbar({ onOpenNav }: { onOpenNav: () => void }) {
         >
           {theme === 'dark' ? <IconSun /> : <IconMoon />}
         </button>
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-violet-deep text-on-primary text-caption font-semibold">
-          CA
+        <span
+          title={`${currentUser.name} · ${currentUser.role}`}
+          className="grid h-9 w-9 place-items-center rounded-full bg-violet-deep text-on-primary text-caption font-semibold"
+        >
+          {getInitials(currentUser.name)}
         </span>
       </div>
     </header>

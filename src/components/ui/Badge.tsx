@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '../../lib/cn'
-import type { ProductStatus, SourcingType } from '../../data/types'
+import type { OrderStatus, ProductStatus, SourcingType } from '../../data/types'
 
 type Tone = 'neutral' | 'violet' | 'pink' | 'lime' | 'muted'
 
@@ -79,6 +79,29 @@ const sourcingLabel: Record<SourcingType, string> = {
 export function SourcingBadge({ sourcing, short = false }: { sourcing: SourcingType; short?: boolean }) {
   const label = short && sourcing === 'fabricacion' ? 'Fabricación' : sourcingLabel[sourcing]
   return <Badge tone={sourcingTone[sourcing]}>{label}</Badge>
+}
+
+// Estado de la solicitud de pedido (paleta segura).
+const orderStatusTone: Record<OrderStatus, Tone> = {
+  pendiente: 'muted',
+  aprobada: 'violet',
+  enviada: 'neutral',
+  entregada: 'violet',
+  rechazada: 'pink',
+}
+const orderStatusText: Record<OrderStatus, string> = {
+  pendiente: 'Pendiente',
+  aprobada: 'Aprobada',
+  enviada: 'Enviada',
+  entregada: 'Entregada',
+  rechazada: 'Rechazada',
+}
+export function OrderStatusBadge({ status }: { status: OrderStatus }) {
+  return (
+    <Badge tone={orderStatusTone[status]} dot>
+      {orderStatusText[status]}
+    </Badge>
+  )
 }
 
 const userStatusTone: Record<string, Tone> = {

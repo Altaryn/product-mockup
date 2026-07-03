@@ -1,15 +1,24 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { products, productById } from '../data/products.mock'
 import { clients } from '../data/clients.mock'
 import { resolvePrice } from '../lib/pricing'
 import { formatCLP, formatNumber } from '../lib/format'
+import { useAppState } from '../store'
 import { PageHeader } from '../components/ui/PageHeader'
 import { Card, SectionTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Input, SelectField } from '../components/ui/Field'
 import { Badge } from '../components/ui/Badge'
-import { IconSearch, IconCart, IconTrash, IconCheck, IconPlus, IconTruck } from '../components/ui/icons'
+import {
+  IconSearch,
+  IconCart,
+  IconTrash,
+  IconCheck,
+  IconPlus,
+  IconTruck,
+  IconChevronRight,
+} from '../components/ui/icons'
 
 interface Line {
   productId: string
@@ -21,6 +30,7 @@ const fmtPallets = (n: number) => n.toLocaleString('es-CL', { maximumFractionDig
 
 export function OrderRequestPage() {
   const [params] = useSearchParams()
+  const { currentUser, orders, addOrder } = useAppState()
   const [clientId, setClientId] = useState('CL-101')
   const [query, setQuery] = useState('')
   const [lines, setLines] = useState<Line[]>([])
@@ -73,11 +83,35 @@ export function OrderRequestPage() {
     0,
   )
 
+  // Registra el pedido en el historial (store en memoria), a nombre del usuario activo.
+  const confirmOrder = () => {
+    if (lines.length === 0) return
+    const nextNum = Math.max(0, ...orders.map((o) => Number(o.id.split('-')[2]) || 0)) + 1
+    const id = `SP-2026-${String(nextNum).padStart(4, '0')}`
+    addOrder({
+      id,
+      userId: currentUser.id,
+      clientId,
+      date: new Date().toISOString().slice(0, 10),
+      status: 'pendiente',
+      lines: lines.map((l) => ({ productId: l.productId, qty: l.qty })),
+    })
+    setConfirmed(id)
+  }
+
   return (
     <div className="space-y-6">
+      <nav className="flex items-center gap-1.5 text-caption text-content-muted">
+        <Link to="/pedidos" className="hover:text-content">
+          Solicitudes de pedido
+        </Link>
+        <IconChevronRight size={14} />
+        <span className="text-content">Nueva</span>
+      </nav>
+
       <PageHeader
         eyebrow="Compras"
-        title="Solicitud de pedido"
+        title="Nueva solicitud de pedido"
         subtitle="Busca productos, define cantidades y revisa precio vigente y logística (pallets y peso) para ajustar la carga según el transporte."
       />
 
@@ -104,6 +138,11 @@ export function OrderRequestPage() {
             <p className="mt-2 text-caption text-content-faint">
               El precio unitario se resuelve con la lista de este cliente y el tramo por volumen.
             </p>
+            <div className="mt-3 flex items-center gap-2 border-t border-hairline pt-3 text-caption text-content-muted">
+              Solicitante:{' '}
+              <span className="font-medium text-content">{currentUser.name}</span>
+              <Badge tone="neutral">{currentUser.role}</Badge>
+            </div>
           </Card>
 
           <Card className="p-5">
@@ -295,17 +334,15 @@ export function OrderRequestPage() {
               </div>
               <div className="mt-4 flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:justify-end">
                 {confirmed ? (
-                  <div className="flex items-center gap-2 rounded-md bg-violet/10 px-4 py-2 text-body-md text-content">
+                  <div className="flex flex-wrap items-center gap-2 rounded-md bg-violet/10 px-4 py-2 text-body-md text-content">
                     <IconCheck size={18} className="text-violet" />
-                    Solicitud <span className="font-mono font-medium">{confirmed}</span> creada
+                    Solicitud <span className="font-mono font-medium">{confirmed}</span> registrada
+                    <Link to="/pedidos" className="ml-1 text-violet underline hover:no-underline">
+                      Ver en Solicitudes
+                    </Link>
                   </div>
                 ) : (
-                  <Button
-                    disabled={priced.length === 0}
-                    onClick={() =>
-                      setConfirmed(`SP-2026-${String(1040 + lines.length * 7).padStart(4, '0')}`)
-                    }
-                  >
+                  <Button disabled={priced.length === 0} onClick={confirmOrder}>
                     <IconCheck size={18} /> Confirmar solicitud
                   </Button>
                 )}

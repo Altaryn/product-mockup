@@ -52,7 +52,7 @@ export function CommercialPanel({ product }: { product: Product }) {
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <div className="text-micro-cap uppercase text-content-muted">Precio unitario vigente</div>
-              <div className="mt-0.5 font-display text-[34px] leading-none text-content tabular-nums">
+              <div className="mt-0.5 font-display text-[26px] leading-none text-content tabular-nums">
                 {formatCLP(res.unitPrice)}
                 <span className="text-body-md font-sans font-normal text-content-faint">
                   {' '}
@@ -133,7 +133,7 @@ export function CommercialPanel({ product }: { product: Product }) {
         <Card className="p-5">
           <h4 className="text-micro-cap uppercase text-content-muted">Acciones</h4>
           <div className="mt-3 flex flex-col gap-2.5">
-            <Link to={`/pedidos?product=${product.id}`}>
+            <Link to={`/pedidos/nuevo?product=${product.id}`}>
               <Button className="w-full">
                 <IconCart size={18} /> Crear solicitud de pedido
               </Button>

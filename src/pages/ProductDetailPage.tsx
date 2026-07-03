@@ -73,7 +73,7 @@ export function ProductDetailPage() {
       <Card className="p-5 sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex gap-4">
-            <span className="hidden h-14 w-14 shrink-0 place-items-center rounded-lg bg-violet/10 font-display text-[26px] text-violet sm:grid">
+            <span className="hidden h-12 w-12 shrink-0 place-items-center rounded-lg bg-violet/10 font-display text-[22px] text-violet sm:grid">
               ▤
             </span>
             <div className="min-w-0">
@@ -108,7 +108,7 @@ export function ProductDetailPage() {
                   <IconSliders size={16} /> Precios
                 </Button>
               </Link>
-              <Link to={`/pedidos?product=${product.id}`}>
+              <Link to={`/pedidos/nuevo?product=${product.id}`}>
                 <Button size="sm">
                   <IconCart size={16} /> Solicitar <IconArrowRight size={16} />
                 </Button>

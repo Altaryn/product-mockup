@@ -118,3 +118,24 @@ export interface User {
   status: 'activo' | 'invitado' | 'inactivo'
   permissions: Record<PermissionArea, PermissionLevel>
 }
+
+export type OrderStatus = 'pendiente' | 'aprobada' | 'enviada' | 'entregada' | 'rechazada'
+
+/** Línea de una solicitud: producto + cantidad. Los montos se derivan al vuelo. */
+export interface OrderLine {
+  productId: string
+  qty: number
+}
+
+/**
+ * Solicitud de pedido registrada (historial). `lines` es la fuente de verdad;
+ * ítems y total se calculan con la lista del cliente (ver lib/orders).
+ */
+export interface Order {
+  id: string // p. ej. "SP-2026-0142"
+  userId: string // quién la generó
+  clientId: string
+  date: string // ISO
+  status: OrderStatus
+  lines: OrderLine[]
+}

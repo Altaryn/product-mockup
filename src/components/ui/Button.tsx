@@ -16,7 +16,7 @@ const base =
   'transition-colors select-none disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap'
 
 const sizes: Record<Size, string> = {
-  sm: 'text-[13px] px-3 py-1.5 min-h-[36px]',
+  sm: 'text-[12px] px-3 py-1.5 min-h-[34px]',
   md: 'text-button-cap px-4 py-3 min-h-[44px]', // 44px WCAG touch target
 }
 

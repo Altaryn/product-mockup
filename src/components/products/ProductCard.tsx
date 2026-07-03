@@ -21,7 +21,7 @@ export function ProductCard({ product: p }: { product: Product }) {
       className="card group flex flex-col p-4 transition-shadow hover:shadow-e2"
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="grid h-11 w-11 place-items-center rounded-md bg-violet/10 font-display text-[20px] text-violet">
+        <span className="grid h-10 w-10 place-items-center rounded-md bg-violet/10 font-display text-[18px] text-violet">
           {glyph[p.category] ?? '▣'}
         </span>
         <ProductStatusBadge status={p.status} />
