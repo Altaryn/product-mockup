@@ -4,18 +4,21 @@ import { productById } from '../data/products.mock'
 import { formatCLP, formatDate } from '../lib/format'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
-import { Badge, ProductStatusBadge } from '../components/ui/Badge'
+import { Badge, ProductStatusBadge, SourcingBadge } from '../components/ui/Badge'
 import { Tabs, type TabItem } from '../components/ui/Tabs'
 import { TechSpecs } from '../components/detail/TechSpecs'
 import { CommercialPanel } from '../components/detail/CommercialPanel'
 import { LogisticsPanel } from '../components/detail/LogisticsPanel'
+import { DocumentationPanel } from '../components/detail/DocumentationPanel'
 import { SuppliersPanel } from '../components/detail/SuppliersPanel'
+import { getDocuments } from '../data/documents.mock'
 import {
   IconChevronRight,
   IconBox,
   IconSliders,
   IconTruck,
   IconBuilding,
+  IconDoc,
   IconArrowRight,
   IconCart,
 } from '../components/ui/icons'
@@ -41,6 +44,12 @@ export function ProductDetailPage() {
     { id: 'tech', label: 'Información técnica', icon: <IconBox size={18} /> },
     { id: 'commercial', label: 'Comercial', icon: <IconSliders size={18} /> },
     { id: 'logistics', label: 'Logística', icon: <IconTruck size={18} /> },
+    {
+      id: 'docs',
+      label: 'Documentación',
+      icon: <IconDoc size={18} />,
+      count: getDocuments(product).length,
+    },
     {
       id: 'suppliers',
       label: 'Proveedores',
@@ -68,9 +77,10 @@ export function ProductDetailPage() {
               ▤
             </span>
             <div className="min-w-0">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="font-mono text-code text-content-muted">{product.code}</span>
                 <ProductStatusBadge status={product.status} />
+                <SourcingBadge sourcing={product.sourcing} />
               </div>
               <h1 className="mt-1 font-display text-heading-lg text-content">{product.name}</h1>
               <div className="mt-2.5 flex flex-wrap gap-2">
@@ -115,6 +125,7 @@ export function ProductDetailPage() {
           {tab === 'tech' && <TechSpecs tech={product.tech} />}
           {tab === 'commercial' && <CommercialPanel product={product} />}
           {tab === 'logistics' && <LogisticsPanel product={product} />}
+          {tab === 'docs' && <DocumentationPanel product={product} />}
           {tab === 'suppliers' && <SuppliersPanel supplierIds={product.supplierIds} />}
         </div>
       </div>

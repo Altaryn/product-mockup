@@ -6,12 +6,31 @@ import { cn } from '../../lib/cn'
 
 export function AppShell() {
   const [navOpen, setNavOpen] = useState(false)
+  // Colapsado por defecto, con opción de expandir (persistido).
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    try {
+      const v = localStorage.getItem('pm-sidebar-collapsed')
+      return v === null ? true : v === 'true'
+    } catch {
+      return true
+    }
+  })
+  const toggleCollapse = () =>
+    setCollapsed((c) => {
+      const next = !c
+      try {
+        localStorage.setItem('pm-sidebar-collapsed', String(next))
+      } catch {
+        /* ignore */
+      }
+      return next
+    })
 
   return (
     <div className="flex h-screen overflow-hidden bg-app-bg">
       {/* Desktop rail */}
       <div className="hidden shrink-0 lg:block">
-        <Sidebar />
+        <Sidebar collapsed={collapsed} onToggleCollapse={toggleCollapse} />
       </div>
 
       {/* Mobile slide-over */}

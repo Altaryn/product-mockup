@@ -3,18 +3,21 @@ import { useSearchParams } from 'react-router-dom'
 import { products, productById } from '../data/products.mock'
 import { clients } from '../data/clients.mock'
 import { resolvePrice } from '../lib/pricing'
-import { formatCLP } from '../lib/format'
+import { formatCLP, formatNumber } from '../lib/format'
 import { PageHeader } from '../components/ui/PageHeader'
 import { Card, SectionTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Input, SelectField } from '../components/ui/Field'
 import { Badge } from '../components/ui/Badge'
-import { IconSearch, IconCart, IconTrash, IconCheck, IconPlus } from '../components/ui/icons'
+import { IconSearch, IconCart, IconTrash, IconCheck, IconPlus, IconTruck } from '../components/ui/icons'
 
 interface Line {
   productId: string
   qty: number
 }
+
+// Pallets con hasta 1 decimal (es-CL).
+const fmtPallets = (n: number) => n.toLocaleString('es-CL', { maximumFractionDigits: 1 })
 
 export function OrderRequestPage() {
   const [params] = useSearchParams()
@@ -60,13 +63,22 @@ export function OrderRequestPage() {
     return { line: l, product, price: resolvePrice(product, clientId, l.qty) }
   })
   const total = priced.reduce((sum, p) => sum + p.price.lineTotal, 0)
+  // Logística agregada del pedido (para elegir/ajustar transporte).
+  const totalPallets = priced.reduce(
+    (sum, p) => sum + p.line.qty / p.product.logistics.unitsPerPallet,
+    0,
+  )
+  const totalWeight = priced.reduce(
+    (sum, p) => sum + (p.line.qty / p.product.logistics.unitsPerPallet) * p.product.logistics.palletWeightKg,
+    0,
+  )
 
   return (
     <div className="space-y-6">
       <PageHeader
         eyebrow="Compras"
         title="Solicitud de pedido"
-        subtitle="Busca productos, define cantidades y revisa el precio unitario vigente según cliente y tramo antes de confirmar."
+        subtitle="Busca productos, define cantidades y revisa precio vigente y logística (pallets y peso) para ajustar la carga según el transporte."
       />
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -167,63 +179,114 @@ export function OrderRequestPage() {
                   <span />
                 </div>
 
-                {priced.map(({ line, product, price }) => (
-                  <div
-                    key={line.productId}
-                    className="grid grid-cols-2 items-center gap-3 px-5 py-3 sm:grid-cols-[1fr_120px_140px_140px_40px]"
-                  >
-                    <div className="col-span-2 min-w-0 sm:col-span-1">
-                      <div className="truncate text-body-md font-medium text-content">{product.name}</div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-caption text-content-faint">{product.code}</span>
-                        {price.discountPct > 0 && (
-                          <Badge tone="violet">−{price.discountPct}% volumen</Badge>
+                {priced.map(({ line, product, price }) => {
+                  const upp = product.logistics.unitsPerPallet
+                  const palletsExact = upp > 0 ? line.qty / upp : 0
+                  const lineWeight = Math.round(palletsExact * product.logistics.palletWeightKg)
+                  const remainder = upp > 0 ? line.qty % upp : 0
+                  const partial = line.qty > 0 && remainder !== 0
+                  const targetQty = Math.ceil(palletsExact) * upp
+                  return (
+                    <div key={line.productId} className="px-5 py-3">
+                      <div className="grid grid-cols-2 items-center gap-3 sm:grid-cols-[1fr_120px_140px_140px_40px]">
+                        <div className="col-span-2 min-w-0 sm:col-span-1">
+                          <div className="truncate text-body-md font-medium text-content">{product.name}</div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-caption text-content-faint">{product.code}</span>
+                            {price.discountPct > 0 && (
+                              <Badge tone="violet">−{price.discountPct}% volumen</Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="sm:justify-self-center">
+                          <div className="flex items-center rounded-sm border border-hairline">
+                            <Input
+                              type="number"
+                              min={0}
+                              value={line.qty}
+                              onChange={(e) => setQty(line.productId, Number(e.target.value))}
+                              className="w-full border-0 bg-transparent text-center tabular-nums focus:ring-0"
+                            />
+                          </div>
+                          <div className="mt-0.5 text-center text-micro-cap uppercase text-content-faint">
+                            {product.unit}
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <div className="text-body-md font-medium tabular-nums text-content">
+                            {formatCLP(price.unitPrice)}
+                          </div>
+                          {price.fromClientList && (
+                            <div className="text-micro-cap uppercase text-violet">Precio cliente</div>
+                          )}
+                        </div>
+
+                        <div className="text-right text-body-md font-semibold tabular-nums text-content">
+                          {formatCLP(price.lineTotal)}
+                        </div>
+
+                        <button
+                          onClick={() => remove(line.productId)}
+                          aria-label="Quitar línea"
+                          className="justify-self-end text-content-muted hover:text-pink"
+                        >
+                          <IconTrash size={18} />
+                        </button>
+                      </div>
+
+                      {/* Logística de la línea */}
+                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-caption text-content-muted">
+                        <span className="inline-flex items-center gap-1.5">
+                          <IconTruck size={14} /> {formatNumber(upp)} {product.unit}/pallet
+                        </span>
+                        <span>
+                          <span className="font-medium text-content tabular-nums">
+                            {fmtPallets(palletsExact)}
+                          </span>{' '}
+                          pallets
+                        </span>
+                        <span className="tabular-nums">{formatNumber(lineWeight)} kg</span>
+                        {partial && (
+                          <button
+                            onClick={() => setQty(line.productId, targetQty)}
+                            className="rounded-xs border border-hairline px-1.5 py-0.5 text-violet transition-colors hover:bg-violet/10"
+                          >
+                            Completar a {Math.ceil(palletsExact)} pallets (+{formatNumber(upp - remainder)}{' '}
+                            {product.unit})
+                          </button>
                         )}
                       </div>
                     </div>
-
-                    <div className="sm:justify-self-center">
-                      <div className="flex items-center rounded-sm border border-hairline">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={line.qty}
-                          onChange={(e) => setQty(line.productId, Number(e.target.value))}
-                          className="w-full border-0 bg-transparent text-center tabular-nums focus:ring-0"
-                        />
-                      </div>
-                      <div className="mt-0.5 text-center text-micro-cap uppercase text-content-faint">
-                        {product.unit}
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="text-body-md font-medium tabular-nums text-content">
-                        {formatCLP(price.unitPrice)}
-                      </div>
-                      {price.fromClientList && (
-                        <div className="text-micro-cap uppercase text-violet">Precio cliente</div>
-                      )}
-                    </div>
-
-                    <div className="text-right text-body-md font-semibold tabular-nums text-content">
-                      {formatCLP(price.lineTotal)}
-                    </div>
-
-                    <button
-                      onClick={() => remove(line.productId)}
-                      aria-label="Quitar línea"
-                      className="justify-self-end text-content-muted hover:text-pink"
-                    >
-                      <IconTrash size={18} />
-                    </button>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
 
             {/* Footer / totals */}
             <div className="border-t border-hairline bg-surface-2 px-5 py-4">
+              {priced.length > 0 && (
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-hairline pb-3 text-caption text-content-muted">
+                  <span className="inline-flex items-center gap-1.5">
+                    <IconTruck size={15} /> Logística del pedido
+                  </span>
+                  <span className="flex flex-wrap gap-x-5 gap-y-1">
+                    <span>
+                      Total pallets:{' '}
+                      <span className="font-medium text-content tabular-nums">
+                        {fmtPallets(totalPallets)}
+                      </span>
+                    </span>
+                    <span>
+                      Peso:{' '}
+                      <span className="font-medium text-content tabular-nums">
+                        {formatNumber(Math.round(totalWeight))} kg
+                      </span>
+                    </span>
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between">
                 <span className="text-body-md text-content-muted">Total estimado</span>
                 <span className="font-display text-heading-md text-content tabular-nums">

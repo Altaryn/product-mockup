@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '../../lib/cn'
-import type { ProductStatus } from '../../data/types'
+import type { ProductStatus, SourcingType } from '../../data/types'
 
 type Tone = 'neutral' | 'violet' | 'pink' | 'lime' | 'muted'
 
@@ -62,6 +62,23 @@ export function ProductStatusBadge({ status }: { status: ProductStatus }) {
       {productStatusLabel[status]}
     </Badge>
   )
+}
+
+// Origen comercial — diferencia fabricación propia / compra / reventa.
+const sourcingTone: Record<SourcingType, Tone> = {
+  fabricacion: 'violet',
+  compra: 'neutral',
+  reventa: 'pink',
+}
+const sourcingLabel: Record<SourcingType, string> = {
+  fabricacion: 'Fabricación propia',
+  compra: 'Compra',
+  reventa: 'Reventa',
+}
+
+export function SourcingBadge({ sourcing, short = false }: { sourcing: SourcingType; short?: boolean }) {
+  const label = short && sourcing === 'fabricacion' ? 'Fabricación' : sourcingLabel[sourcing]
+  return <Badge tone={sourcingTone[sourcing]}>{label}</Badge>
 }
 
 const userStatusTone: Record<string, Tone> = {

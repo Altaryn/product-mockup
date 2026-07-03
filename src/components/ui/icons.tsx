@@ -173,3 +173,30 @@ export const IconCube = (p: P) => (
     <path d="M3 7.5 12 13l9-5.5M12 13v9" />
   </Base>
 )
+export const IconDoc = (p: P) => (
+  <Base {...p}>
+    <path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7l-4-4Z" />
+    <path d="M14 3v4h4M9 13h6M9 17h4" />
+  </Base>
+)
+export const IconDownload = (p: P) => (
+  <Base {...p}>
+    <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" />
+  </Base>
+)
+export const IconUpload = (p: P) => (
+  <Base {...p}>
+    <path d="M12 15V3m0 0 4 4m-4-4L8 7M5 21h14" />
+  </Base>
+)
+export const IconChevronLeft = (p: P) => (
+  <Base {...p}>
+    <path d="m15 6-6 6 6 6" />
+  </Base>
+)
+export const IconPanelLeft = (p: P) => (
+  <Base {...p}>
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <path d="M9 4v16" />
+  </Base>
+)

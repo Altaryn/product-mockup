@@ -1,11 +1,11 @@
-import type { Product } from './types'
+import type { Product, SourcingType } from './types'
 
 /**
  * Centralized mock catalog. Iterate here to reshape the whole app.
  * Data realista de materiales de construcción (Knauf: placas, perfilería,
  * aislación, pastas, cielos, fijaciones). Precios en CLP.
  */
-export const products: Product[] = [
+const baseProducts: Omit<Product, 'sourcing'>[] = [
   {
     id: 'p-pyc-std-125',
     code: 'PYC-STD-125',
@@ -548,6 +548,31 @@ export const products: Product[] = [
     supplierIds: ['SUP-05'],
   },
 ]
+
+/**
+ * Origen comercial por SKU. Fabricación propia (planta Knauf), compra a
+ * proveedor externo, o reventa de producto terminado importado entre sedes.
+ */
+const sourcingById: Record<string, SourcingType> = {
+  'p-pyc-std-125': 'fabricacion',
+  'p-pyc-rf-150': 'fabricacion',
+  'p-pyc-rh-125': 'fabricacion',
+  'p-pyc-ad-125': 'reventa',
+  'p-mont-70': 'compra',
+  'p-canal-70': 'compra',
+  'p-mont-48': 'compra',
+  'p-lv-roll-50': 'reventa',
+  'p-lr-panel-50': 'reventa',
+  'p-pasta-junta-20': 'compra',
+  'p-cinta-papel-75': 'compra',
+  'p-cielo-mod-60': 'reventa',
+  'p-torn-25': 'compra',
+}
+
+export const products: Product[] = baseProducts.map((p) => ({
+  ...p,
+  sourcing: sourcingById[p.id] ?? 'fabricacion',
+}))
 
 export const productById = (id: string): Product | undefined =>
   products.find((p) => p.id === id)

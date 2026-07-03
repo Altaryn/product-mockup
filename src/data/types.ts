@@ -2,6 +2,27 @@
 
 export type ProductStatus = 'activo' | 'borrador' | 'descontinuado'
 
+/** Origen comercial del producto en la red Knauf. */
+export type SourcingType = 'fabricacion' | 'compra' | 'reventa'
+
+export type DocumentType =
+  | 'Ficha técnica'
+  | 'Certificado'
+  | 'Declaración de prestaciones'
+  | 'Ficha de seguridad'
+  | 'Manual de instalación'
+
+/** Documento técnico adjunto a un producto (ficha, certificado, etc.). */
+export interface ProductDocument {
+  id: string
+  name: string
+  type: DocumentType
+  format: 'PDF' | 'DOCX' | 'DWG'
+  sizeKB: number
+  version: string
+  updatedAt: string // ISO date
+}
+
 /** A single technical attribute. `group` lets the UI cluster specs by section. */
 export interface TechAttribute {
   label: string
@@ -47,6 +68,8 @@ export interface Product {
   subcategory: string
   family: string
   status: ProductStatus
+  /** Fabricación propia / compra a externo / reventa entre sedes. */
+  sourcing: SourcingType
   /** Commercial unit, e.g. "m²", "un", "rollo", "saco". */
   unit: string
   basePrice: number

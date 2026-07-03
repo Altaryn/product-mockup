@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import type { Product } from '../../data/types'
 import { formatCLP } from '../../lib/format'
-import { ProductStatusBadge } from '../ui/Badge'
+import { ProductStatusBadge, SourcingBadge } from '../ui/Badge'
 import { IconChevronRight } from '../ui/icons'
 
 export function ProductTable({ items }: { items: Product[] }) {
@@ -16,6 +16,7 @@ export function ProductTable({ items }: { items: Product[] }) {
             <th className="px-4 py-3 font-medium">Producto</th>
             <th className="hidden px-4 py-3 font-medium md:table-cell">Categoría</th>
             <th className="hidden px-4 py-3 font-medium lg:table-cell">Familia</th>
+            <th className="hidden px-4 py-3 font-medium md:table-cell">Tipo</th>
             <th className="px-4 py-3 text-right font-medium">Precio base</th>
             <th className="px-4 py-3 font-medium">Estado</th>
             <th className="px-4 py-3" />
@@ -40,6 +41,9 @@ export function ProductTable({ items }: { items: Product[] }) {
               <td className="hidden px-4 py-3 text-content-muted md:table-cell">{p.category}</td>
               <td className="hidden px-4 py-3 lg:table-cell">
                 <span className="text-content-muted">{p.family}</span>
+              </td>
+              <td className="hidden px-4 py-3 md:table-cell">
+                <SourcingBadge sourcing={p.sourcing} short />
               </td>
               <td className="px-4 py-3 text-right">
                 <span className="font-medium text-content tabular-nums">{formatCLP(p.basePrice)}</span>
