@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Product } from '../../data/types'
 import { formatCLP } from '../../lib/format'
-import { ProductStatusBadge, SourcingBadge } from '../ui/Badge'
+import { ProductStatusBadge, SourcingBadges } from '../ui/Badge'
 import { IconArrowRight } from '../ui/icons'
 
 /** Category → short glyph for the card thumbnail (no photography in the system). */
@@ -34,7 +34,7 @@ export function ProductCard({ product: p }: { product: Product }) {
           {p.category} · {p.subcategory}
         </div>
         <div className="mt-2">
-          <SourcingBadge sourcing={p.sourcing} />
+          <SourcingBadges sourcing={p.sourcing} />
         </div>
       </div>
 

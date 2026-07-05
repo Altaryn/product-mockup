@@ -68,8 +68,11 @@ export interface Product {
   subcategory: string
   family: string
   status: ProductStatus
-  /** Fabricación propia / compra a externo / reventa entre sedes. */
-  sourcing: SourcingType
+  /**
+   * Origen(es) comercial(es). Puede ser más de uno: p. ej. un SKU que se
+   * fabrica localmente y además se importa (reventa) desde otra sede.
+   */
+  sourcing: SourcingType[]
   /** Commercial unit, e.g. "m²", "un", "rollo", "saco". */
   unit: string
   basePrice: number

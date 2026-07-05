@@ -4,7 +4,7 @@ import { useAppState } from '../store'
 import { formatCLP, formatDate } from '../lib/format'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
-import { Badge, ProductStatusBadge, SourcingBadge } from '../components/ui/Badge'
+import { Badge, ProductStatusBadge, SourcingBadges } from '../components/ui/Badge'
 import { Tabs, type TabItem } from '../components/ui/Tabs'
 import { TechSpecs } from '../components/detail/TechSpecs'
 import { CommercialPanel } from '../components/detail/CommercialPanel'
@@ -81,7 +81,7 @@ export function ProductDetailPage() {
               <div className="flex flex-wrap items-center gap-3">
                 <span className="font-mono text-code text-content-muted">{product.code}</span>
                 <ProductStatusBadge status={product.status} />
-                <SourcingBadge sourcing={product.sourcing} />
+                <SourcingBadges sourcing={product.sourcing} />
               </div>
               <h1 className="mt-1 font-display text-heading-lg text-content">{product.name}</h1>
               <div className="mt-2.5 flex flex-wrap gap-2">

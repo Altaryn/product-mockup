@@ -553,25 +553,25 @@ const baseProducts: Omit<Product, 'sourcing'>[] = [
  * Origen comercial por SKU. Fabricación propia (planta Knauf), compra a
  * proveedor externo, o reventa de producto terminado importado entre sedes.
  */
-const sourcingById: Record<string, SourcingType> = {
-  'p-pyc-std-125': 'fabricacion',
-  'p-pyc-rf-150': 'fabricacion',
-  'p-pyc-rh-125': 'fabricacion',
-  'p-pyc-ad-125': 'reventa',
-  'p-mont-70': 'compra',
-  'p-canal-70': 'compra',
-  'p-mont-48': 'compra',
-  'p-lv-roll-50': 'reventa',
-  'p-lr-panel-50': 'reventa',
-  'p-pasta-junta-20': 'compra',
-  'p-cinta-papel-75': 'compra',
-  'p-cielo-mod-60': 'reventa',
-  'p-torn-25': 'compra',
+const sourcingById: Record<string, SourcingType[]> = {
+  'p-pyc-std-125': ['fabricacion', 'reventa'], // se fabrica local y se importa entre sedes
+  'p-pyc-rf-150': ['fabricacion'],
+  'p-pyc-rh-125': ['fabricacion'],
+  'p-pyc-ad-125': ['reventa'],
+  'p-mont-70': ['compra'],
+  'p-canal-70': ['compra', 'fabricacion'], // compra a externo y también producción propia
+  'p-mont-48': ['compra'],
+  'p-lv-roll-50': ['reventa'],
+  'p-lr-panel-50': ['reventa'],
+  'p-pasta-junta-20': ['compra'],
+  'p-cinta-papel-75': ['compra'],
+  'p-cielo-mod-60': ['fabricacion', 'reventa'],
+  'p-torn-25': ['compra'],
 }
 
 export const products: Product[] = baseProducts.map((p) => ({
   ...p,
-  sourcing: sourcingById[p.id] ?? 'fabricacion',
+  sourcing: sourcingById[p.id] ?? ['fabricacion'],
 }))
 
 export const productById = (id: string): Product | undefined =>

@@ -81,6 +81,25 @@ export function SourcingBadge({ sourcing, short = false }: { sourcing: SourcingT
   return <Badge tone={sourcingTone[sourcing]}>{label}</Badge>
 }
 
+/** Renderiza uno o más orígenes (un producto puede tener varios). */
+export function SourcingBadges({
+  sourcing,
+  short = false,
+  className,
+}: {
+  sourcing: SourcingType[]
+  short?: boolean
+  className?: string
+}) {
+  return (
+    <span className={cn('inline-flex flex-wrap items-center gap-1.5', className)}>
+      {sourcing.map((s) => (
+        <SourcingBadge key={s} sourcing={s} short={short} />
+      ))}
+    </span>
+  )
+}
+
 // Estado de la solicitud de pedido (paleta segura).
 const orderStatusTone: Record<OrderStatus, Tone> = {
   pendiente: 'muted',

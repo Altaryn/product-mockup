@@ -9,7 +9,7 @@ import { PageHeader } from '../components/ui/PageHeader'
 import { Card, SectionTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Field, Input, SelectField } from '../components/ui/Field'
-import { Badge, ProductStatusBadge, SourcingBadge } from '../components/ui/Badge'
+import { Badge, ProductStatusBadge, SourcingBadges } from '../components/ui/Badge'
 import {
   IconChevronRight,
   IconPlus,
@@ -70,7 +70,7 @@ export function NewProductPage() {
   const [family, setFamily] = useState('')
   const [unit, setUnit] = useState('m²')
   const [status, setStatus] = useState<ProductStatus>('borrador')
-  const [sourcing, setSourcing] = useState<SourcingType>('fabricacion')
+  const [sourcing, setSourcing] = useState<SourcingType[]>(['fabricacion'])
   // Comercial
   const [basePrice, setBasePrice] = useState(0)
   // Ficha técnica
@@ -103,8 +103,10 @@ export function NewProductPage() {
     name: !name.trim() ? 'Ingresa un nombre.' : '',
     category: !category.trim() ? 'Indica una categoría.' : '',
     basePrice: !(basePrice > 0) ? 'Ingresa un precio base mayor a 0.' : '',
+    sourcing: sourcing.length === 0 ? 'Selecciona al menos un origen.' : '',
   }
-  const isValid = !errors.code && !errors.name && !errors.category && !errors.basePrice
+  const isValid =
+    !errors.code && !errors.name && !errors.category && !errors.basePrice && !errors.sourcing
 
   const updateTech = (id: string, patch: Partial<TechRow>) =>
     setTech((ts) => ts.map((t) => (t.id === id ? { ...t, ...patch } : t)))
@@ -116,6 +118,8 @@ export function NewProductPage() {
   const removeTechRow = (id: string) => setTech((ts) => ts.filter((t) => t.id !== id))
   const toggleSupplier = (id: string) =>
     setSupplierIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))
+  const toggleSourcing = (v: SourcingType) =>
+    setSourcing((s) => (s.includes(v) ? s.filter((x) => x !== v) : [...s, v]))
 
   const submit = () => {
     setSubmitted(true)
@@ -187,7 +191,7 @@ export function NewProductPage() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-code text-content-muted">{code.trim() || 'CÓDIGO-SKU'}</span>
               <ProductStatusBadge status={status} />
-              <SourcingBadge sourcing={sourcing} />
+              <SourcingBadges sourcing={sourcing} />
             </div>
             <div className="mt-1 font-display text-heading-sm text-content">
               {name.trim() || 'Nombre del producto'}
@@ -276,17 +280,33 @@ export function NewProductPage() {
               </option>
             ))}
           </SelectField>
-          <SelectField
-            label="Origen (sourcing)"
-            value={sourcing}
-            onChange={(e) => setSourcing(e.target.value as SourcingType)}
-          >
-            {SOURCING_OPTIONS.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </SelectField>
+          <Field label="Origen (sourcing)">
+            <div className="flex flex-wrap gap-2">
+              {SOURCING_OPTIONS.map((s) => {
+                const on = sourcing.includes(s.value)
+                return (
+                  <button
+                    type="button"
+                    key={s.value}
+                    onClick={() => toggleSourcing(s.value)}
+                    aria-pressed={on}
+                    className={cn(
+                      'rounded-sm border px-3 py-2 text-body-md transition-colors',
+                      on
+                        ? 'border-violet bg-violet/10 font-medium text-violet'
+                        : 'border-hairline-strong text-content-muted hover:bg-surface-2',
+                    )}
+                  >
+                    {s.label}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="mt-1 text-caption text-content-faint">
+              Puede ser más de uno (p. ej. fabricación propia + importación entre sedes).
+            </p>
+            <FieldError show={submitted} msg={errors.sourcing} />
+          </Field>
         </div>
       </Card>
 

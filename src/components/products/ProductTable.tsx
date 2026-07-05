@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import type { Product } from '../../data/types'
 import { formatCLP } from '../../lib/format'
-import { ProductStatusBadge, SourcingBadge } from '../ui/Badge'
+import { ProductStatusBadge, SourcingBadges } from '../ui/Badge'
 import { IconChevronRight } from '../ui/icons'
 
 export function ProductTable({ items }: { items: Product[] }) {
@@ -43,7 +43,7 @@ export function ProductTable({ items }: { items: Product[] }) {
                 <span className="text-content-muted">{p.family}</span>
               </td>
               <td className="hidden px-4 py-3 md:table-cell">
-                <SourcingBadge sourcing={p.sourcing} short />
+                <SourcingBadges sourcing={p.sourcing} short />
               </td>
               <td className="px-4 py-3 text-right">
                 <span className="font-medium text-content tabular-nums">{formatCLP(p.basePrice)}</span>
